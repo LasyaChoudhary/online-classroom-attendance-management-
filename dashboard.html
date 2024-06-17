@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Class Attendance</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Include QuaggaJS library -->
+    <script src="https://unpkg.com/quagga/dist/quagga.min.js"></script>
+    <style>
+        /* Optional: CSS for button alignment */
+        #dashboard button {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="dashboard">
+            <h2>Dashboard</h2>
+            <button onclick="logout()">Logout</button>
+            <div id="classes">
+                <!-- List of classes will be appended here -->
+            </div>
+            <form id="attendance" onsubmit="markAttendance(event)">
+                <h3>Mark Attendance</h3>
+                <label for="rollnumber">Roll Number:</label>
+                <input type="text" id="rollnumber" name="rollnumber" required>
+                <label for="studentname">Student Name:</label>
+                <input type="text" id="studentname" name="studentname" required>
+                <button type="submit">Mark Attendance</button>
+            </form>
+            <div>
+                <button id="startScannerBtn" onclick="startScanner()">Start QR Scanner</button>
+                <button id="stopScannerBtn" onclick="stopScanner()" style="display: none;">Stop QR Scanner</button>
+            </div>
+            <div id="interactive" class="viewport" style="display: none;"></div>
+            <div id="scanner-results"></div>
+        </div>
+    </div>
+    <script>
+        let scannerIsRunning = false;
+        let quaggaApp;
+
+        function logout() {
+            alert('Logging out...');
+            window.location.href = 'login.html';
+        }
+
+        function startScanner() {
+            document.getElementById('interactive').style.display = 'block';
+            document.getElementById('startScannerBtn').style.display = 'none';
+            document.getElementById('stopScannerBtn').style.display = 'inline-block';
+            
+            Quagga.init({
+                inputStream: {
+                    name: "Live",
+                    type: "LiveStream",
+                    target: document.querySelector('#interactive'),
+                    constraints: {
+                        facingMode: "environment"  // or user, depending on camera direction
+                    },
+                },
+                decoder: {
+                    readers: ["code_128_reader"]  // List of supported barcode types
+                }
+            }, function(err) {
+                if (err) {
+                    console.error(err);
+                    return;
+                }
+                console.log("QuaggaJS initialized successfully.");
+
+                // Start the scanner
+                Quagga.start();
+                scannerIsRunning = true;
+            });
+
+            // Register listener for when a barcode is detected
+            Quagga.onDetected(function(result) {
+                let code = result.codeResult.code;
+                document.getElementById('scanner-results').innerText = `Scanned QR Code: ${code}`;
+
+                // Example: Assuming QR code format is "rollnumber|studentname"
+                let [rollnumber, studentname] = code.split('|');
+                document.getElementById('rollnumber').value = rollnumber;
+                document.getElementById('studentname').value = studentname;
+
+                // Hide the scanner after a successful scan
+                document.getElementById('interactive').style.display = 'none';
+
+                // Stop the scanner after a successful scan
+                Quagga.stop();
+                scannerIsRunning = false;
+
+                // Toggle button visibility
+                document.getElementById('startScannerBtn').style.display = 'inline-block';
+                document.getElementById('stopScannerBtn').style.display = 'none';
+            });
+        }
+
+        function stopScanner() {
+            if (scannerIsRunning) {
+                Quagga.stop();
+                scannerIsRunning = false;
+                document.getElementById('interactive').style.display = 'none';
+
+                // Toggle button visibility
+                document.getElementById('startScannerBtn').style.display = 'inline-block';
+                document.getElementById('stopScannerBtn').style.display = 'none';
+            }
+        }
+
+        // Function to handle form submission for marking attendance
+        function markAttendance(event) {
+            event.preventDefault();
+            // Perform your attendance marking logic here
+            let rollnumber = document.getElementById('rollnumber').value;
+            let studentname = document.getElementById('studentname').value;
+
+            // Example: You might send this data to a server via AJAX
+            console.log(`Marking attendance for ${studentname} (${rollnumber})`);
+
+            // Clear input fields after submission
+            document.getElementById('rollnumber').value = '';
+            document.getElementById('studentname').value = '';
+        }
+    </script>
+    <script src="scripts.js"></script>
+</body>
+</html>

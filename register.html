@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Class Attendance</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="website">
+        <div id="loginForm" class="form-container">
+            <h2>Login</h2>
+            <form id="login" onsubmit="login(event)">
+                <label for="role">Select Role:</label>
+                <select id="role" required>
+                    <option value="student">Student</option>
+                    <option value="faculty">Faculty</option>
+                </select>
+                <label for="loginEmail">Email:</label>
+                <input type="email" id="loginEmail" required>
+                <label for="loginPassword">Password:</label>
+                <input type="password" id="loginPassword" required>
+                <button type="submit">Login</button>
+                <p>Don't have an account? <a href="register.html">Register</a></p>
+            </form>
+        </div>
+    </div>
+    <script src="scripts.js"></script>
+    <script>
+        function login(event) {
+            event.preventDefault();
+            let role = document.getElementById('role').value;
+            let email = document.getElementById('loginEmail').value;
+            let password = document.getElementById('loginPassword').value;
+
+            // Example: Perform authentication logic based on role (replace with your own)
+            if (role === 'student') {
+                // Example student authentication
+                if (email === 'student@example.com' && password === 'student123') {
+                    alert('Student login successful');
+                    // Redirect to student dashboard or desired page
+                    window.location.href = 'student_dashboard.html';
+                } else {
+                    alert('Student login failed. Invalid credentials.');
+                }
+            } else if (role === 'faculty') {
+                // Example faculty authentication
+                if (email === 'faculty@example.com' && password === 'faculty123') {
+                    alert('Faculty login successful');
+                    // Redirect to faculty dashboard or desired page
+                    window.location.href = 'faculty_dashboard.html';
+                } else {
+                    alert('Faculty login failed. Invalid credentials.');
+                }
+            } else {
+                alert('Please select a role.');
+            }
+        }
+    </script>
+</body>
+</html>
